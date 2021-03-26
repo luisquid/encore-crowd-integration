@@ -21,16 +21,28 @@ public class TwitchManager : MonoBehaviour
         client.OnMessageReceived += MyMessageRecievedFunction;
         client.OnChatCommandReceived += OnChatCommandReceived;
         client.OnUserJoined += OnUserJoinedStream;
+        client.OnUserLeft += OnUserLeftStream;
     }
 
     private void OnUserJoinedStream(object sender, OnUserJoinedArgs e)
     {
-        print(e.Username);
+        print("USER JOINED STREAM: " + e.Username);
+
+        //EncoreManager.Instance.SpawnCrowdPerson(e.Username);
+    }
+
+    private void OnUserLeftStream(object sender, OnUserLeftArgs e)
+    {
+        print("USER LEFT STREAM: " + e.Username);
+
+        //EncoreManager.Instance.DestroyCrowdPerson(e.Username);
     }
 
     private void MyMessageRecievedFunction(object sender, OnMessageReceivedArgs e)
     {
         print(e.ChatMessage.Username + ": " + e.ChatMessage.Message);
+
+        EncoreManager.Instance.SpawnCrowdPerson(e.ChatMessage.Username);
     }
 
     private void OnChatCommandReceived(object sender, TwitchLib.Client.Events.OnChatCommandReceivedArgs e)

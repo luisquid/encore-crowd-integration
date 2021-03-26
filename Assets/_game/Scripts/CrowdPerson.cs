@@ -5,21 +5,20 @@ using TMPro;
 
 public class CrowdPerson : MonoBehaviour
 {
-    private TextMeshPro personName;
-    Animator personAnim;
+    public string personName;
+    private TextMeshPro personNameText;
+    private Animator personAnim;
     int danceIdParam;
-
-    private void Start()
-    {
-        personAnim = GetComponent<Animator>();
-        personName = GetComponentInChildren<TextMeshPro>();
-        danceIdParam = Animator.StringToHash("DanceId");    
-    }
 
     public void Initialize(string userName)
     {
+        personAnim = GetComponent<Animator>();
+        personNameText = GetComponentInChildren<TextMeshPro>();
+        danceIdParam = Animator.StringToHash("DanceId");
+
         AssignRandomDance();
-        personName.text = userName; 
+        personName = userName;
+        personNameText.text = personName; 
     }
 
     public void AssignRandomDance()
