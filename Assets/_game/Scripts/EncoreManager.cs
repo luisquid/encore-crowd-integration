@@ -8,9 +8,10 @@ using TwitchLib.Client.Events;
 public class EncoreManager : MonoBehaviour
 {
     public GameObject crowdPerson;
-    public Animator cameraAnimator;
     public GameObject corner1;
+    public GameObject corner2;
     public GameObject corner3;
+    public GameObject corner4;
 
     private static EncoreManager _encoreManager;
     public static EncoreManager Instance
@@ -53,23 +54,7 @@ public class EncoreManager : MonoBehaviour
         GameObject temp = Instantiate(crowdPerson, new Vector3(Random.Range(corner1.transform.position.x, corner3.transform.position.x), 
                                                                0.1f, 
                                                                Random.Range(corner1.transform.position.z, corner3.transform.position.z)), Quaternion.identity);
-        
-        if(crowd.Length == 0)
-        {
-            temp.GetComponent<CrowdPerson>().Initialize(_name);
-        }
-
-        for (int i = 0; i < crowd.Length; i++)
-        {
-            if(Vector3.Distance(temp.transform.position, crowd[i].transform.position) < 1.5f)
-            {
-                SpawnCrowdPerson(_name);
-            }
-            else
-            {
-                temp.GetComponent<CrowdPerson>().Initialize(_name);
-            }
-        }
+        temp.GetComponent<CrowdPerson>().Initialize(_name);
     }
 
     public void DestroyCrowdPerson(string _name)
@@ -83,25 +68,6 @@ public class EncoreManager : MonoBehaviour
                 Destroy(crowd[i]);
                 break;
             }
-        }
-    }
-
-    public void TurnCamera(int _turnDirection)
-    {
-        if (_turnDirection == 0)
-        {
-            cameraAnimator.SetBool("TurnLeft", false);
-            cameraAnimator.SetBool("TurnRight", false);
-        }
-        else if(_turnDirection == 1)
-        {
-            cameraAnimator.SetBool("TurnLeft", true);
-            cameraAnimator.SetBool("TurnRight", false);
-        }
-        else
-        {
-            cameraAnimator.SetBool("TurnLeft", false);
-            cameraAnimator.SetBool("TurnRight", true);
         }
     }
     

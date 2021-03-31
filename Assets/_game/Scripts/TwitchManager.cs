@@ -61,15 +61,6 @@ public class TwitchManager : MonoBehaviour
             case "dance":
 
                 break;
-            case "left":
-                EncoreManager.Instance.TurnCamera(1);
-                break;
-            case "right":
-                EncoreManager.Instance.TurnCamera(2);
-                break;
-            case "center":
-                EncoreManager.Instance.TurnCamera(0);
-                break;
             default:
                 break;
         }
