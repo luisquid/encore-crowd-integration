@@ -86,6 +86,31 @@ public class EncoreManager : MonoBehaviour
         }
     }
 
+    public void SetCrowdPersonAnimation(string _userName, int animationId)
+    {
+        print("Animation ID: " + animationId);
+        GameObject[] tempCrowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
+
+        for(int i = 0; i < tempCrowd.Length; i++)
+        {
+            if(tempCrowd[i].GetComponent<CrowdPerson>().personName == _userName)
+            {
+                switch (animationId)
+                {
+                    case 0:
+                        tempCrowd[i].GetComponent<CrowdPerson>().CheerStream();
+                        break;
+                    case 1:
+                        tempCrowd[i].GetComponent<CrowdPerson>().CryStream();
+                        break;
+                    default:
+
+                        break;
+                }
+            }
+        } 
+    }
+
     public void TurnCamera(int _turnDirection)
     {
         if (_turnDirection == 0)

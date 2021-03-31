@@ -52,8 +52,11 @@ public class TwitchManager : MonoBehaviour
             case "headbang":
 
                 break;
-            case "hype":
-
+            case "cheer":
+                EncoreManager.Instance.SetCrowdPersonAnimation(e.Command.ChatMessage.Username, 0);
+                break;
+            case "cry":
+                EncoreManager.Instance.SetCrowdPersonAnimation(e.Command.ChatMessage.Username, 1);
                 break;
             case "encore":
 
