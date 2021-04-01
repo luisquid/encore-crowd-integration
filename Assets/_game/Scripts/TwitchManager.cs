@@ -9,6 +9,9 @@ public class TwitchManager : MonoBehaviour
 {
     public Client client;
     private string channel_name = "luisquid_";
+
+    private PubSub _pubSub;
+
     private void Awake()
     {
         Application.runInBackground = true;
@@ -22,6 +25,17 @@ public class TwitchManager : MonoBehaviour
         client.OnChatCommandReceived += OnChatCommandReceived;
         client.OnUserJoined += OnUserJoinedStream;
         client.OnUserLeft += OnUserLeftStream;
+
+        _pubSub = new PubSub();
+
+        _pubSub.OnChannelCommerceReceived += OnChannelPoints;
+
+        _pubSub.Connect();
+    }
+
+    private void OnChannelPoints(object sender, TwitchLib.PubSub.Events.OnChannelCommerceReceivedArgs e)
+    {
+        print(e.ItemDescription);
     }
 
     private void OnUserJoinedStream(object sender, OnUserJoinedArgs e)
@@ -60,6 +74,9 @@ public class TwitchManager : MonoBehaviour
                 break;
             case "encore":
 
+                break;
+            case "move":
+                EncoreManager.Instance.SendRandomPosition(e.Command.ChatMessage.Username);
                 break;
             case "dance":
 

@@ -51,7 +51,7 @@ public class EncoreManager : MonoBehaviour
         }
 
         GameObject temp = Instantiate(crowdPerson, new Vector3(Random.Range(corner1.transform.position.x, corner3.transform.position.x), 
-                                                               0.1f, 
+                                                               0.05f, 
                                                                Random.Range(corner1.transform.position.z, corner3.transform.position.z)), Quaternion.identity);
         
         if(crowd.Length == 0)
@@ -68,6 +68,21 @@ public class EncoreManager : MonoBehaviour
             else
             {
                 temp.GetComponent<CrowdPerson>().Initialize(_name);
+            }
+        }
+    }
+
+    public void SendRandomPosition(string _username)
+    {
+        GameObject[] crowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
+
+        for (int i = 0; i < crowd.Length; i++)
+        {
+            if (crowd[i].GetComponent<CrowdPerson>().personName == _username)
+            {
+                crowd[i].GetComponent<CrowdPerson>().MoveToPosition(new Vector3(Random.Range(corner1.transform.position.x, corner3.transform.position.x),
+                                                               0.05f,
+                                                               Random.Range(corner1.transform.position.z, corner3.transform.position.z)));
             }
         }
     }

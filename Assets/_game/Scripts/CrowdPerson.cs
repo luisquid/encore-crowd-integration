@@ -6,11 +6,40 @@ using TMPro;
 public class CrowdPerson : MonoBehaviour
 {
     public string personName;
-    private TextMeshPro personNameText;
-    private Animator personAnim;
+    public float speed;
+
     int danceIdParam;
     int cheerIdParam;
     int cryIdParam;
+    int walkIdParam;
+
+    private TextMeshPro personNameText;
+    private Animator personAnim;
+    
+    private float journeyLength;
+    private float startTime;
+
+    private Vector3 initialPosition;
+    private Vector3 endPosition;
+    
+    private void Update()
+    {
+        if(Vector3.Distance(endPosition, transform.position) > 0.1f)
+        {
+            float distCovered = (Time.time - startTime) * speed;
+
+            float fractionOfJourney = distCovered / journeyLength;
+
+            transform.position = Vector3.Lerp(initialPosition, endPosition, fractionOfJourney);
+        }
+        
+        else
+        {
+            print("I AM LOOKING TO THE FRONT");
+            transform.rotation = Quaternion.identity;
+            personAnim.SetBool(walkIdParam, false);
+        }
+    }
 
 
     public void Initialize(string userName)
@@ -20,6 +49,7 @@ public class CrowdPerson : MonoBehaviour
         danceIdParam = Animator.StringToHash("DanceId");
         cheerIdParam = Animator.StringToHash("Cheer");
         cryIdParam = Animator.StringToHash("Crying");
+        walkIdParam = Animator.StringToHash("Walk");
 
         //AssignRandomDance();
         personName = userName;
@@ -39,5 +69,18 @@ public class CrowdPerson : MonoBehaviour
     public void CryStream()
     {
         personAnim.SetTrigger(cryIdParam);
+    }
+
+    public void MoveToPosition(Vector3 _position)
+    {
+        personAnim.SetBool(walkIdParam, true);
+        startTime = Time.time;
+        
+        initialPosition = transform.position;
+        endPosition = _position;
+
+        journeyLength = Vector3.Distance(initialPosition, endPosition);
+
+        transform.LookAt(endPosition);
     }
 }
