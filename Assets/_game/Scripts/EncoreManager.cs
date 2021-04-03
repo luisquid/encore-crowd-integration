@@ -11,7 +11,9 @@ public class EncoreManager : MonoBehaviour
     public Animator cameraAnimator;
     public GameObject corner1;
     public GameObject corner3;
-
+    public GameObject baphoPerson;
+    public GameObject spawnPoint; 
+    
     private static EncoreManager _encoreManager;
     public static EncoreManager Instance
     {
@@ -36,6 +38,30 @@ public class EncoreManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
+        if(Input.GetKeyDown(KeyCode.F1))
+        {
+            TwerkAll();
+        }
+    }
+
+    public void DanceAll()
+    {
+        GameObject[] crowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
+
+        for (int i = 0; i < crowd.Length; i++)
+        {
+            crowd[i].GetComponent<CrowdPerson>().AssignRandomDance();
+        }
+    }
+
+    public void TwerkAll()
+    {
+        GameObject[] crowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
+
+        for (int i = 0; i < crowd.Length; i++)
+        {
+            crowd[i].GetComponent<CrowdPerson>().TwerkStream();
+        }
     }
 
     public void SpawnCrowdPerson(string _name)
@@ -118,12 +144,29 @@ public class EncoreManager : MonoBehaviour
                     case 1:
                         tempCrowd[i].GetComponent<CrowdPerson>().CryStream();
                         break;
+                    case 2:
+                        tempCrowd[i].GetComponent<CrowdPerson>().JumpStream();
+                        break;
+                    case 3:
+                        tempCrowd[i].GetComponent<CrowdPerson>().AssignRandomDance();
+                        break;
+                    case 4:
+                        tempCrowd[i].GetComponent<CrowdPerson>().VibeStream();
+                        break;
+                    case 5:
+                        tempCrowd[i].GetComponent<CrowdPerson>().TwerkStream();
+                        break;
                     default:
 
                         break;
                 }
             }
         } 
+    }
+
+    public void SpawnBapho()
+    {
+        Instantiate(baphoPerson, spawnPoint.transform.position, Quaternion.identity);
     }
 
     public void TurnCamera(int _turnDirection)
