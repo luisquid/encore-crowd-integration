@@ -26,7 +26,6 @@ public class TwitchManager : MonoBehaviour
         client.OnUserLeft += OnUserLeftStream;
     }
 
-
     private void OnUserJoinedStream(object sender, OnUserJoinedArgs e)
     {
         print("USER JOINED STREAM: " + e.Username);
@@ -47,37 +46,58 @@ public class TwitchManager : MonoBehaviour
 
         if(e.ChatMessage.Message[0] != '!')
             lastChatMessage.text = e.ChatMessage.Message;
-        EncoreManager.Instance.SpawnCrowdPerson(e.ChatMessage.Username);
+        EncoreManager.Instance.SpawnCrowdPerson(e.ChatMessage.Username, e.ChatMessage.UserId);
 
     }
 
     private void OnChatCommandReceived(object sender, TwitchLib.Client.Events.OnChatCommandReceivedArgs e)
     {
+        string whoSentTheCommand = e.Command.ChatMessage.Username;
+        string whoSentId = e.Command.ChatMessage.UserId;
+
         switch (e.Command.CommandText)
         {
             case "headbang":
 
                 break;
             case "cheer":
-                EncoreManager.Instance.SetCrowdPersonAnimation(e.Command.ChatMessage.Username, 0);
+                EncoreManager.Instance.SetCrowdPersonAnimation(whoSentId, (int)TriggerId.Trigger_Cheer);
                 break;
             case "cry":
-                EncoreManager.Instance.SetCrowdPersonAnimation(e.Command.ChatMessage.Username, 1);
+                EncoreManager.Instance.SetCrowdPersonAnimation(whoSentId, (int)TriggerId.Trigger_Crying);
                 break;
             case "vibe":
-                EncoreManager.Instance.SetCrowdPersonAnimation(e.Command.ChatMessage.Username, 4);
+                EncoreManager.Instance.SetCrowdPersonAnimation(whoSentId, (int)TriggerId.Trigger_Vibe);
                 break;
             case "move":
                 EncoreManager.Instance.SendRandomPosition(e.Command.ChatMessage.Username);
                 break;
             case "dance":
-                EncoreManager.Instance.SetCrowdPersonAnimation(e.Command.ChatMessage.Username, 3);
+                EncoreManager.Instance.SetCrowdPersonAnimation(whoSentId, (int)TriggerId.Trigger_Dancing);
                 break;
             case "jump":
-                EncoreManager.Instance.SetCrowdPersonAnimation(e.Command.ChatMessage.Username, 2);
+                EncoreManager.Instance.SetCrowdPersonAnimation(whoSentId, (int)TriggerId.Trigger_Jump);
                 break;
             case "twerk":
-                EncoreManager.Instance.SetCrowdPersonAnimation(e.Command.ChatMessage.Username, 5);
+                EncoreManager.Instance.SetCrowdPersonAnimation(whoSentId, (int)TriggerId.Trigger_Twerk);
+                break;
+            case "fight":
+                string fight = "Haha idiot -->";
+                string userArgument = e.Command.ArgumentsAsList[0];
+                if(userArgument.Contains("@"))
+                {
+                    if(userArgument.Split('@')[1] == whoSentTheCommand.ToLower())
+                    {
+                        fight = whoSentTheCommand + ", the worst fight we fight is the fight we fight with ourselves.";
+                        EncoreManager.Instance.SetCrowdPersonAnimation(whoSentId, (int)TriggerId.Trigger_Dead);
+                    }
+                    else
+                    {
+                        fight = e.Command.ChatMessage.Username + " is going to fight " + e.Command.ArgumentsAsList[0].Split('@')[1];
+                        EncoreManager.Instance.SendUserPosition(whoSentTheCommand.ToLower(), e.Command.ArgumentsAsList[0].Split('@')[1].ToLower());
+                    }
+                }
+                lastChatMessage.text = fight;
                 break;
             case "left":
                 EncoreManager.Instance.TurnCamera(1);

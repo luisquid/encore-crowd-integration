@@ -3,19 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+public enum TriggerId
+{
+    Trigger_Cheer,
+    Trigger_Twerk,
+    Trigger_Jump,
+    Trigger_Vibe,
+    Trigger_Dead,
+    Trigger_Crying,
+    Trigger_Dancing
+};
+
 public class CrowdPerson : MonoBehaviour
 {
+    public string personId;
     public string personName;
     public float speed;
 
-    int activateDanceParam;
+    int activateAnimationParam;
     int danceIdParam;
-    int cheerIdParam;
-    int cryIdParam;
+    int triggerIdParam;
+
     int walkIdParam;
-    int jumpIdParam;
-    int vibeIdParam;
-    int twerkIdParam;
 
     private TextMeshPro personNameText;
     private Animator personAnim;
@@ -48,72 +57,36 @@ public class CrowdPerson : MonoBehaviour
     }
 
 
-    public void Initialize(string userName)
+    public void Initialize(string userName, string userId)
     {
         personAnim = GetComponent<Animator>();
         personNameText = GetComponentInChildren<TextMeshPro>();
 
-        activateDanceParam = Animator.StringToHash("ActivateDance");
+        //CURRENT
+        activateAnimationParam = Animator.StringToHash("TriggerAnimation");
+        triggerIdParam = Animator.StringToHash("TriggerId");
         danceIdParam = Animator.StringToHash("DanceId");
-        cheerIdParam = Animator.StringToHash("Cheer");
-        cryIdParam = Animator.StringToHash("Crying");
-        walkIdParam = Animator.StringToHash("Walk");
-        jumpIdParam = Animator.StringToHash("Jump");
-        vibeIdParam = Animator.StringToHash("Vibe");
-        twerkIdParam = Animator.StringToHash("Twerk");
+        //
 
-        //AssignRandomDance();
+        walkIdParam = Animator.StringToHash("Walk");
+
+        personId = userId;
         personName = userName;
         personNameText.text = personName; 
     }
 
-    public void AssignRandomDance()
+    public void TriggerAnimation(TriggerId _animationId)
     {
-        personAnim.SetBool(vibeIdParam, false);
-        personAnim.SetTrigger(activateDanceParam);
-        personAnim.SetInteger(danceIdParam, Random.Range(0, 5));
-    }
-
-    public void CheerStream()
-    {
-        personAnim.SetBool(vibeIdParam, false);
-        personAnim.SetTrigger(cheerIdParam);
-    }
-
-    public void VibeStream()
-    {
-        personAnim.SetBool(vibeIdParam, true);
-        StartCoroutine(WaitToStopVibing());
-    }
-
-    IEnumerator WaitToStopVibing()
-    {
-        yield return new WaitForSeconds(10f);
-        personAnim.SetBool(vibeIdParam, false);
-    }
-
-    public void CryStream()
-    {
-        personAnim.SetBool(vibeIdParam, false);
-        personAnim.SetTrigger(cryIdParam);
-    }
-
-    public void JumpStream()
-    {
-        personAnim.SetBool(vibeIdParam, false);
-        personAnim.SetTrigger(jumpIdParam);
-    }
-
-    public void TwerkStream()
-    {
-        personAnim.SetBool(vibeIdParam, false);
-        personAnim.SetTrigger(twerkIdParam);
+        int randomDanceId = Random.Range(0, 6);
+        print("Random Dance Id: " + randomDanceId);
+        personAnim.SetInteger(danceIdParam, randomDanceId);
+        personAnim.SetTrigger(activateAnimationParam);
+        personAnim.SetInteger(triggerIdParam, (int)_animationId);
     }
 
     public void MoveToPosition(Vector3 _position)
     {
         canMove = true;
-        personAnim.SetBool(vibeIdParam, false);
         personAnim.SetBool(walkIdParam, true);
         startTime = Time.time;
         

@@ -7,13 +7,22 @@ using TwitchLib.Client.Events;
 
 public class EncoreManager : MonoBehaviour
 {
+    [Header("Crowd List")]
+    public List<CrowdPerson> spawnedPeople;
     public GameObject crowdPerson;
+
+    [Header("Camera Movement")]
     public Animator cameraAnimator;
+    
+    [Header("Crowd Spawn Area")]
     public GameObject corner1;
     public GameObject corner3;
-    public GameObject baphoPerson;
-    public GameObject spawnPoint; 
     
+    [Header("Baphomet Event")]
+    public GameObject baphoPerson;
+    public GameObject spawnPoint;
+
+    #region SINGLETON
     private static EncoreManager _encoreManager;
     public static EncoreManager Instance
     {
@@ -32,6 +41,12 @@ public class EncoreManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    #endregion
+
+    private void Start()
+    {
+        spawnedPeople = new List<CrowdPerson>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -44,72 +59,105 @@ public class EncoreManager : MonoBehaviour
         }
     }
 
-    public void DanceAll()
+    /*public void DanceAll()
     {
-        GameObject[] crowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
-
-        for (int i = 0; i < crowd.Length; i++)
+        for (int i = 0; i < spawnedPeople.Count; i++)
         {
-            crowd[i].GetComponent<CrowdPerson>().AssignRandomDance();
+            spawnedPeople[i].AssignRandomDance();
         }
-    }
+    }*/
 
     public void TwerkAll()
     {
-        GameObject[] crowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
-
-        for (int i = 0; i < crowd.Length; i++)
+        for (int i = 0; i < spawnedPeople.Count; i++)
         {
-            crowd[i].GetComponent<CrowdPerson>().TwerkStream();
+            spawnedPeople[i].TriggerAnimation(TriggerId.Trigger_Twerk);
         }
     }
 
-    public void SpawnCrowdPerson(string _name)
+    public bool CheckIfSpawned(string _id)
     {
-        GameObject[] crowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
-
-        for (int i = 0; i < crowd.Length; i++)
+        bool isSpawned = false;
+        for(int i = 0; i < spawnedPeople.Count; i++)
         {
-            if (crowd[i].GetComponent<CrowdPerson>().personName == _name)
+            if(spawnedPeople[i].personId == _id)
             {
-                return;
+                isSpawned = true;
             }
         }
+        return isSpawned;
+    }
+
+    public void SpawnCrowdPerson(string _name, string _id)
+    {
+        if (CheckIfSpawned(_id))
+            return;
 
         GameObject temp = Instantiate(crowdPerson, new Vector3(Random.Range(corner1.transform.position.x, corner3.transform.position.x), 
                                                                0.05f, 
                                                                Random.Range(corner1.transform.position.z, corner3.transform.position.z)), Quaternion.identity);
+
+        temp.GetComponent<CrowdPerson>().Initialize(_name, _id);
+        spawnedPeople.Add(temp.GetComponent<CrowdPerson>());
         
-        if(crowd.Length == 0)
+        /*
+        if(spawnedPeople.Count == 0)
         {
-            temp.GetComponent<CrowdPerson>().Initialize(_name);
+            spawnedPeople.Add(temp.GetComponent<CrowdPerson>());
+            temp.GetComponent<CrowdPerson>().Initialize(_name, _id);
         }
 
-        for (int i = 0; i < crowd.Length; i++)
+        else
         {
-            if(Vector3.Distance(temp.transform.position, crowd[i].transform.position) < 1.5f)
+            for (int i = 0; i < spawnedPeople.Count; i++)
             {
-                SpawnCrowdPerson(_name);
+                if (Vector3.Distance(temp.transform.position, spawnedPeople[i].gameObject.transform.position) < 1.5f)
+                {
+                    SpawnCrowdPerson(_name, _id);
+                }
+                else
+                {
+                    spawnedPeople.Add(temp.GetComponent<CrowdPerson>());
+                    temp.GetComponent<CrowdPerson>().Initialize(_name, _id);
+                }
             }
-            else
+        }    */
+        
+    }
+
+    //Recursive function to assign position that isn't held yet
+    public void AssignRandomPosition()
+    {
+
+    }
+
+    public void SendRandomPosition(string _username)
+    {
+        for (int i = 0; i < spawnedPeople.Count; i++)
+        {
+            if (spawnedPeople[i].personName == _username)
             {
-                temp.GetComponent<CrowdPerson>().Initialize(_name);
+                spawnedPeople[i].MoveToPosition(new Vector3(Random.Range(corner1.transform.position.x, corner3.transform.position.x),
+                                                               0.05f,
+                                                               Random.Range(corner1.transform.position.z, corner3.transform.position.z)));
             }
         }
     }
 
-    public void SendRandomPosition(string _username)
+    public void SendUserPosition(string fighter, string tobefought)
     {
         GameObject[] crowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
 
         for (int i = 0; i < crowd.Length; i++)
         {
-            if (crowd[i].GetComponent<CrowdPerson>().personName == _username)
+            for(int j = 0; j < crowd.Length; j++)
             {
-                crowd[i].GetComponent<CrowdPerson>().MoveToPosition(new Vector3(Random.Range(corner1.transform.position.x, corner3.transform.position.x),
-                                                               0.05f,
-                                                               Random.Range(corner1.transform.position.z, corner3.transform.position.z)));
+                if (crowd[i].GetComponent<CrowdPerson>().personName == fighter && crowd[j].GetComponent<CrowdPerson>().personName == tobefought)
+                {
+                    crowd[i].GetComponent<CrowdPerson>().MoveToPosition(crowd[j].transform.position);
+                }
             }
+         
         }
     }
 
@@ -127,41 +175,17 @@ public class EncoreManager : MonoBehaviour
         }
     }
 
-    public void SetCrowdPersonAnimation(string _userName, int animationId)
+    public void SetCrowdPersonAnimation(string _userId, int animationId)
     {
-        print("Animation ID: " + animationId);
-        GameObject[] tempCrowd = GameObject.FindGameObjectsWithTag("CrowdPerson");
+        TriggerId animId = (TriggerId)animationId;
 
-        for(int i = 0; i < tempCrowd.Length; i++)
+        for(int i = 0; i < spawnedPeople.Count; i++)
         {
-            if(tempCrowd[i].GetComponent<CrowdPerson>().personName == _userName)
+            if(spawnedPeople[i].personId == _userId)
             {
-                switch (animationId)
-                {
-                    case 0:
-                        tempCrowd[i].GetComponent<CrowdPerson>().CheerStream();
-                        break;
-                    case 1:
-                        tempCrowd[i].GetComponent<CrowdPerson>().CryStream();
-                        break;
-                    case 2:
-                        tempCrowd[i].GetComponent<CrowdPerson>().JumpStream();
-                        break;
-                    case 3:
-                        tempCrowd[i].GetComponent<CrowdPerson>().AssignRandomDance();
-                        break;
-                    case 4:
-                        tempCrowd[i].GetComponent<CrowdPerson>().VibeStream();
-                        break;
-                    case 5:
-                        tempCrowd[i].GetComponent<CrowdPerson>().TwerkStream();
-                        break;
-                    default:
-
-                        break;
-                }
+                spawnedPeople[i].TriggerAnimation(animId);
             }
-        } 
+        }    
     }
 
     public void SpawnBapho()
